@@ -8,12 +8,12 @@ This is a report for the peer assessment #1 ot the reproducible research course 
 
 ###Loading and formatting the data
 
-```{r}
+
+```r
 unzip("activity.zip")
 data <-read.csv("activity.csv")
 data$date <- as.Date(data$date)
 Sys.setenv(LANG = "en")
-
 ```
 
 
@@ -21,46 +21,71 @@ Sys.setenv(LANG = "en")
 
 A histogram of the total number of steps
 
-```{r}
+
+```r
 total_by_day <- aggregate(data$steps, list(data$date), sum, na.rm=T)
 hist(total_by_day$x, main = "Histogram of total number of steps per day", col = "purple", xlab = "Steps per day")
-
 ```
+
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
 Median of steps per day
-```{r}
+
+```r
 med_orig <- median(total_by_day$x, na.rm=T)
 med_orig
 ```
+
+```
+## [1] 10395
+```
 Mean of steps per day
-```{r}
+
+```r
 mean_orig <- mean(total_by_day$x, na.rm=T)
 mean_orig
 ```
+
+```
+## [1] 9354.23
+```
 ###What is the average daily activity pattern
 A graph of the average number of steps  
-```{r}
+
+```r
 average_by_interval <- aggregate(data$steps, list(data$interval), mean, na.rm=T)
 plot(average_by_interval$Group.1, average_by_interval$x, main = "Graph of average number of steps per interval", type = "l", col = "purple", xlab = "Interval",
      ylab = "Average steps"
      )
-
 ```
+
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
 
 The inteval with the largest number of steps  
 
-```{r}
+
+```r
 mx_idx <- which.max(average_by_interval$x)
 average_by_interval$Group.1[mx_idx]
 ```
 
+```
+## [1] 835
+```
+
 ###Imputing missing values  
 The number of missing values  
-```{r}
+
+```r
 sum(is.na(data$steps))
 ```
 
+```
+## [1] 2304
+```
+
 Creating a new table without missing values. The strategy to do it: reprace the missing value with the averate steps for the iterval of this row
-```{r}
+
+```r
 data_mod <- data
 for (i in 1:length(data_mod$steps)){
     if (is.na(data_mod$steps[i])){
@@ -73,39 +98,63 @@ for (i in 1:length(data_mod$steps)){
 ```
 
 Histogram of total steps by day on a modified data
-```{r}
+
+```r
 total_by_day_mod <- aggregate(data_mod$steps, list(data_mod$date), sum, na.rm=T)
 hist(total_by_day_mod$x, main = "Histogram of total number of steps per day (with imputed values)", col = "orange", xlab = "Steps per day")
 ```
 
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
+
 Median of steps per day
-```{r}
+
+```r
 med_mod <- median(total_by_day_mod$x, na.rm=T)
 med_mod
 ```
 
+```
+## [1] 10766.19
+```
+
 Mean of steps per day
-```{r}
+
+```r
 mean_mod <- mean(total_by_day_mod$x, na.rm=T)
 mean_mod
 ```
 
+```
+## [1] 10766.19
+```
+
 Difference between the original median and that computed on a set with inputed values
-```{r}
+
+```r
 med_orig - med_mod
+```
+
+```
+## [1] -371.1887
 ```
 
 
 Difference between the original mean and that computed on a set with inputed values
-```{r}
+
+```r
 mean_orig - mean_mod
+```
+
+```
+## [1] -1411.959
 ```
 
 ###Differences in activity patterns between weekdays and weekends
 
 Graphs for average number of steps for weekends and weekdays
 
-```{r}
+
+```r
 #add a coun with weekdays
 library(plyr)
 wk <- weekdays(data_mod$date)
@@ -118,7 +167,14 @@ data_mod <- mutate(data_mod, weekdays = wk)
 aggr_wd <- aggregate(data_mod$steps, list(data_mod$interval, data_mod$weekday), mean)
 
 library(ggplot2)
-qplot(Group.1, x, data = aggr_wd, facets = Group.2~., geom = "line", ylab = "Average steps", xlab = "Interval")
-
+```
 
 ```
+## Warning: package 'ggplot2' was built under R version 3.1.3
+```
+
+```r
+qplot(Group.1, x, data = aggr_wd, facets = Group.2~., geom = "line", ylab = "Average steps", xlab = "Interval")
+```
+
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) 
